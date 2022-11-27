@@ -1,18 +1,22 @@
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 public class Main {
+
+    private static final String JPG_EXTENSION = ".jpg";
     public static void main(String[] args) throws IOException {
 
-        String src = "C:/users/sunpu/desktop/src";
-        String dst = "C:/users/sunpu/desktop/FolderWithNames";
-        
+        String src = "D:\\Изображения\\Антонявр год\\2022-11-20-СТ2-1820\\понравились";
+        String dst = src;
+
         createAndFillFile(src, dst);
 
     }
@@ -20,10 +24,23 @@ public class Main {
     public static void createAndFillFile(String src, String dst) throws IOException {
         File dir = new File(src);
         File[] files = dir.listFiles();
-        List<File> fileList = Arrays.asList(files);
         List<String> filesNames = new ArrayList<>();
 
-        fileList.forEach(file -> filesNames.add(file.getName()));
+        for (File file : files) {
+
+            if (file.getName().endsWith(JPG_EXTENSION)) {
+                String fileName = getFileNameWithoutExtension(file.getName());
+                BufferedImage image = ImageIO.read(file);
+                int height = image.getHeight();
+                int width = image.getWidth();
+                if (height >= width) {
+                    fileName += " - в";
+                } else {
+                    fileName += " - г";
+                }
+                filesNames.add(fileName + JPG_EXTENSION);
+            }
+        }
 
         Path dstFolder = Paths.get(dst);
         Path dstFile = Paths.get(dst + "/names.txt");
@@ -41,5 +58,9 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String getFileNameWithoutExtension(String fileName) {
+        return fileName.substring(0, fileName.lastIndexOf('.') + 1);
     }
 }
